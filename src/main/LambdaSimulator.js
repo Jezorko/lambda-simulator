@@ -1,3 +1,6 @@
+const http = require('http');
+
+
 class LambdaResponse {
     constructor(httpStatusCode, body) {
         this.httpStatusCode = httpStatusCode;
@@ -27,6 +30,42 @@ class LambdaSimulator {
 
     constructor(handler) {
         this.handler = handler;
+    }
+
+    listen(port, hostName) {
+        if (!port) port = 3000;
+        if (!hostName) hostName = '127.0.0.1';
+        const server = http.createServer((request, response) => {
+            if (request.method !== 'GET') {
+                let bodyAsString = '';
+                request.on('data', chunk => {
+                    bodyAsString += chunk.toString();
+                });
+                request.on('end', () => {
+                    this.sendRequest(request.method, request.url, JSON.parse(bodyAsString))
+                        .then(result => {
+                            response.statusCode = result.httpStatusCode;
+                            response.setHeader('Content-Type', 'application/json');
+                            response.end(JSON.stringify(result.body));
+                        });
+                });
+            } else {
+                this.sendGetRequest(request.url).then(result => {
+                    console.log(`result: ${result}`);
+                    response.statusCode = result.httpStatusCode;
+                    response.setHeader('Content-Type', 'application/json');
+                    response.end(JSON.stringify(result.body))
+                })
+            }
+
+        });
+
+        return new Promise(resolve => {
+            server.listen(port, hostName, () => {
+                console.log(`${LambdaSimulator.name} listening on port ${port}`);
+                resolve()
+            })
+        });
     }
 
     async sendGetRequest(url) {
