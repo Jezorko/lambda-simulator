@@ -13,7 +13,7 @@ class LambdaResponse {
     }
 }
 
-const getJsonFromUrl = url => {
+const getQueryParamsFromUrl = url => {
     const result = {};
     if (url) {
         const query = url.split("?")[1];
@@ -29,8 +29,9 @@ const getJsonFromUrl = url => {
 
 class LambdaSimulator {
 
-    constructor(handler) {
+    constructor(handler, proxy) {
         this.handler = handler;
+        if (proxy) this.proxy = proxy;
     }
 
     listen(port, hostName) {
@@ -96,10 +97,16 @@ class LambdaSimulator {
         };
 
         // simulate sending body via wire
-        const event = {
-            ...getJsonFromUrl(url), // URL variables have lower priority and will be overwritten by request body
-            ...JSON.parse(JSON.stringify(requestBody))
-        };
+        const queryParams = getQueryParamsFromUrl(url);
+        let event;
+        if (this.proxy) {
+            event = this.proxy.requestTransformer(httpMethod, url, requestBody, queryParams);
+        } else {
+            event = {
+                ...queryParams, // URL query params have lower priority and will be overwritten by request body
+                ...JSON.parse(JSON.stringify(requestBody))
+            };
+        }
 
         let finalResult;
         let finalError;
@@ -138,7 +145,9 @@ class LambdaSimulator {
         console.log = oldConsoleLog;
         console.log(`END RequestId: ${context.awsRequestId}`);
         console.log(`REPORT RequestId: ${context.awsRequestId} Duration: ${duration} ms`);
-        return new LambdaResponse(200, responseBody);
+        let lambdaResponse = new LambdaResponse(200, responseBody);
+        if (this.proxy) lambdaResponse = this.proxy.responseTransformer(lambdaResponse);
+        return lambdaResponse;
     }
 
 }
