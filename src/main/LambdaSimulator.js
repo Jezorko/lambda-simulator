@@ -1,18 +1,14 @@
 const http = require('http');
 const uuidv4 = require('uuid/v4');
+const LambdaResponse = require('./LambdaResponse').LambdaResponse;
+const LambdaSimulatorProxy = require('./LambdaSimulatorProxy').LambdaSimulatorProxy;
 
-
-class LambdaResponse {
-    constructor(httpStatusCode, body) {
-        this.httpStatusCode = httpStatusCode;
-        this.body = body;
-    }
-
-    toString() {
-        return `HTTP ${this.httpStatusCode}: ${JSON.stringify(this.body)}`;
-    }
-}
-
+/**
+ * Extracts query parameters from a URL.
+ *
+ * @param {string} url a valid URL
+ * @returns {Object} an object where keys are query parameter names and values are their values
+ */
 const getQueryParamsFromUrl = url => {
     const result = {};
     if (url) {
@@ -27,13 +23,26 @@ const getQueryParamsFromUrl = url => {
     return result;
 };
 
+/**
+ * Wrapper over AWS Lambda handler methods that makes them easy to unit test.
+ */
 class LambdaSimulator {
 
+    /**
+     * @param {function} handler the AWS Lambda handler method
+     * @param {LambdaSimulatorProxy?} proxy transformer for requests / responses from the handler method
+     */
     constructor(handler, proxy) {
         this.handler = handler;
         if (proxy) this.proxy = proxy;
     }
 
+    /**
+     * Starts a simple {http} server that sends all the requests to the AWS Lambda Handler.
+     * @param {number?} port the port this server will listen on, 3000 by default
+     * @param {string?} hostName the hostname this server will listen on, localhost by default
+     * @returns {Promise<*>} the promise that resolves when the server starts
+     */
     listen(port, hostName) {
         if (!port) port = 3000;
         if (!hostName) hostName = '127.0.0.1';
@@ -70,14 +79,32 @@ class LambdaSimulator {
         });
     }
 
+    /**
+     * Shorthand for sendRequest with 'GET' as the first parameter and an empty body.
+     * @param {string} url to send the request to
+     * @returns {Promise<LambdaResponse>} the response from the AWS Lambda
+     */
     async sendGetRequest(url) {
         return await this.sendRequest('GET', url, {});
     }
 
+    /**
+     * Shorthand for sendRequest with 'POST' as the first parameter.
+     * @param {string} url to send the request to
+     * @param {*} requestBody that will be sent as an event to AWS Lambda Handler
+     * @returns {Promise<LambdaResponse>} the response from the AWS Lambda
+     */
     async sendPostRequest(url, requestBody) {
         return await this.sendRequest('POST', url, requestBody);
     }
 
+    /**
+     * Sends given request to the AWS Lambda handler.
+     * @param {string} httpMethod to use with this request
+     * @param {string} url to send the request to
+     * @param {*} requestBody that will be sent as an event to AWS Lambda Handler
+     * @returns {Promise<LambdaResponse>} the response from the AWS Lambda
+     */
     async sendRequest(httpMethod, url, requestBody) {
         const context = {
             functionName: 'lambda-simulator',
