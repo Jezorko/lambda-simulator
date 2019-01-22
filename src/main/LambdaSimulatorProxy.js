@@ -18,9 +18,12 @@ const awsGatewayLambdaIntegrationProxy = new LambdaSimulatorProxy(
     },
     response => {
         const body = response.body;
-        return new LambdaResponse(body.statusCode, {
-            body: body.body // ... said the gravedigger
-        });
+        return new LambdaResponse(
+            response.statusCode,
+            {
+                body: body.body // ... said the gravedigger
+            }
+        );
     });
 
 
