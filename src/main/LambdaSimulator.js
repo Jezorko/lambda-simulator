@@ -87,7 +87,12 @@ class LambdaSimulator {
         console.log(`START RequestId: ${context.awsRequestId} Version: ${context.functionVersion}`);
         const oldConsoleLog = console.log;
         console.log = (...params) => {
-            oldConsoleLog(`${new Date().toISOString()} ${context.awsRequestId} ${params[0]}`, ...(params.slice(1)));
+            const message = params[0];
+            if (typeof message === 'string') {
+                oldConsoleLog(`${new Date().toISOString()} ${context.awsRequestId} ${message}`, ...(params.slice(1)));
+            } else {
+                oldConsoleLog(`${new Date().toISOString()} ${context.awsRequestId}`, message, ...(params.slice(1)));
+            }
         };
 
         // simulate sending body via wire
