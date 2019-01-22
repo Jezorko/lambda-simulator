@@ -19,9 +19,9 @@ const awsGatewayLambdaIntegrationProxy = new LambdaSimulatorProxy(
     response => {
         const body = response.body;
         return new LambdaResponse(
-            response.statusCode,
+            body ? body.statusCode : 500,
             {
-                body: body ? body.body : null // ... said the gravedigger
+                body: body ? body.body : "ERROR: body is missing" // ... said the gravedigger
             }
         );
     });
