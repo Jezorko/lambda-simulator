@@ -1,0 +1,21 @@
+{
+  "name": "lambda-simulator",
+  "version": "0.0.1",
+  "description": "AWS Lambda integration testing tool",
+  "main": "src/main/index.js",
+  "scripts": {
+    "test": "mocha './src/test/**.test.js' -R spec"
+  },
+  "license": "WTFPL",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/Jezorko/`lambda-simulator`.git"
+  },
+  "dependencies": {
+    "node": "^11.7.0"
+  },
+  "devDependencies": {
+    "mocha": "^5.2.0",
+    "sinon": "^7.2.3"
+  }
+}
