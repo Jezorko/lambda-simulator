@@ -1,4 +1,5 @@
 const http = require('http');
+const uuidv4 = require('uuid/v4');
 
 
 class LambdaResponse {
@@ -77,6 +78,18 @@ class LambdaSimulator {
     }
 
     async sendRequest(httpMethod, url, requestBody) {
+        const context = {
+            functionName: 'lambda-simulator',
+            functionVersion: '$LATEST',
+            awsRequestId: uuidv4()
+        };
+
+        console.log(`START RequestId: ${context.awsRequestId} Version: ${context.functionVersion}`);
+        const oldConsoleLog = console.log;
+        console.log = (...params) => {
+            oldConsoleLog(`${new Date().toISOString()} ${context.awsRequestId} ${params[0]}`, ...(params.slice(1)));
+        };
+
         // simulate sending body via wire
         const event = {
             ...getJsonFromUrl(url), // URL variables have lower priority and will be overwritten by request body
@@ -94,8 +107,9 @@ class LambdaSimulator {
                 finalResult = result;
         };
 
+        const lambdaStartTime = new Date();
         try {
-            const result = await this.handler(event, {}, callback);
+            const result = await this.handler(event, context, callback);
             // in case the async callback already set either of these
             if (!finalResult) finalResult = result;
         } catch (error) {
@@ -113,6 +127,12 @@ class LambdaSimulator {
         }
 
         const responseBody = finalError ? finalError : finalResult;
+
+        const lambdaEndTime = new Date();
+        const duration = lambdaEndTime - lambdaStartTime;
+        console.log = oldConsoleLog;
+        console.log(`END RequestId: ${context.awsRequestId}`);
+        console.log(`REPORT RequestId: ${context.awsRequestId} Duration: ${duration} ms`);
         return new LambdaResponse(200, responseBody);
     }
 

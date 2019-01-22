@@ -12,7 +12,8 @@
     "url": "git://github.com/Jezorko/`lambda-simulator`.git"
   },
   "dependencies": {
-    "node": "^11.7.0"
+    "node": "^11.7.0",
+    "uuid": "^3.3.2"
   },
   "devDependencies": {
     "mocha": "^5.2.0",
