@@ -38,12 +38,15 @@ const awsGatewayLambdaIntegrationProxy = new LambdaSimulatorProxy(
      */
     response => {
         const body = response.body;
-        return new LambdaResponse(
-            body ? body.statusCode : 500,
-            {
-                body: body ? JSON.stringify(body.body) : "ERROR: body is missing" // ... said the gravedigger
-            }
-        );
+        try {
+            return new LambdaResponse(
+                body ? body.statusCode : 200,
+                body ? JSON.parse(body.body) : "ERROR: body is missing"
+            );
+        } catch (e) {
+            // For AWS Gateway, you need to JSON.stringify your body!
+            return new LambdaResponse(502, 'malformed Lambda proxy response');
+        }
     });
 
 
