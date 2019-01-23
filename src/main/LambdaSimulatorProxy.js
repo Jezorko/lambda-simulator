@@ -1,4 +1,4 @@
-const LambdaResponse = require("./LambdaSimulator").LambdaResponse;
+const LambdaResponse = require("./LambdaResponse").LambdaResponse;
 
 /**
  * Allows request and response transformation.
