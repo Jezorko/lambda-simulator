@@ -39,12 +39,12 @@ class LambdaSimulator {
 
     /**
      * Starts a simple {http} server that sends all the requests to the AWS Lambda Handler.
-     * @param {number?} port the port this server will listen on, 3000 by default
+     * @param {number?} port the port this server will listen on, random by default
      * @param {string?} hostName the hostname this server will listen on, localhost by default
      * @returns {Promise<*>} the promise that resolves when the server starts
      */
     listen(port, hostName) {
-        if (!port) port = 3000;
+        if (typeof port !== 'number') port = 0;
         if (!hostName) hostName = '127.0.0.1';
         const server = http.createServer((request, response) => {
             if (request.method !== 'GET') {
@@ -73,7 +73,7 @@ class LambdaSimulator {
 
         return new Promise(resolve => {
             server.listen(port, hostName, () => {
-                console.log(`${LambdaSimulator.name} listening on port ${port}`);
+                console.log(`${LambdaSimulator.name} listening on port ${server.address().port}`);
                 resolve()
             })
         });
