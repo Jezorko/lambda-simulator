@@ -1,6 +1,6 @@
 const LambdaSimulatorProxy = require('./LambdaSimulatorProxy').LambdaSimulatorProxy;
 const LambdaResponse = require('../LambdaResponse').LambdaResponse;
-Route = require('route-parser');
+const Route = require('route-parser');
 
 
 const EMPTY_ROUTE = new Route('/');
