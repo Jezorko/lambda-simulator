@@ -53,6 +53,10 @@ class LambdaSimulator {
                     bodyAsString += chunk.toString();
                 });
                 request.on('end', () => {
+                    if (!bodyAsString) {
+                        console.log("fatal error: request body is empty");
+                        bodyAsString = '{}';
+                    }
                     this.sendRequest(request.method, request.url, JSON.parse(bodyAsString))
                         .then(result => {
                             response.statusCode = result.httpStatusCode;
