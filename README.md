@@ -4,6 +4,9 @@
 This is a simple project that allows you to unit test your AWS Lambda handlers.
 Additionally, you can use it to run the Lambda locally for some manual testing.
 
+Do *not* use this as a replacement for AWS Lambda services in production.
+This would be a terrible idea.
+
 ## How do I use it?
 
 ### Unit testing
@@ -47,6 +50,23 @@ describe('my AWS Lambda handler', function() {
 });
 ```
 
+#### Path parameters
+If you'd like the path parameters to be parsed by the AwsGatewayLambdaIntegrationProxy, you need to provide a URL template.
+For example this proxy object:
+
+```javascript
+new AwsGatewayLambdaIntegrationProxy('/resource/:resourceId/sub-resource/:subResourceId')
+```
+
+Will yield the following pathParameters object in your Lambda:
+
+```json
+{
+  "resourceId": "5",
+  "subResourceId": "bla"
+}
+```
+
 ### Manual testing
 If you'd like to test your Lambda manually, start the `LambdaSimulator` server by calling the `listen` method:
 
@@ -73,10 +93,7 @@ Stuff that is missing, from the top of my head:
  * headers handling
  * many fields when using the [AWS API Gateway proxy](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-create-api-as-simple-proxy-for-lambda.html)
  * other proxy implementations
- * memory allocation statistics (not sure if possible with Node)
- 
-Do *not* use this as a replacement for AWS Lambda services in production.
-This would be a terrible idea. 
+ * memory allocation statistics (not sure if possible with Node) 
  
 ## Contribution guidelines
 All I ask for is tests and documentation in form of JS docstrings.

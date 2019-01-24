@@ -11,11 +11,11 @@ describe(AwsGatewayLambdaIntegrationProxy.name, function () {
 
         it('should append path parameters if URL template is provided', () => {
             // when:
-            const result = proxyWithUrlTemplate.requestTransformer('ANY', '/resource/5/sub-resource/10', {}, {});
+            const result = proxyWithUrlTemplate.requestTransformer('ANY', '/resource/5/sub-resource/bla', {}, {});
 
             // then:
             assert.strictEqual(result.pathParameters.resourceId, '5');
-            assert.strictEqual(result.pathParameters.subResourceId, '10');
+            assert.strictEqual(result.pathParameters.subResourceId, 'bla');
         });
 
         it('should stringify request body and put it inside a "body" event field', () => {
