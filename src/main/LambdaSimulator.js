@@ -1,7 +1,7 @@
 const http = require('http');
 const uuidv4 = require('uuid/v4');
 const LambdaResponse = require('./LambdaResponse').LambdaResponse;
-const LambdaSimulatorProxy = require('./LambdaSimulatorProxy').LambdaSimulatorProxy;
+const LambdaSimulatorProxy = require('./proxy/LambdaSimulatorProxy').LambdaSimulatorProxy;
 
 /**
  * Extracts query parameters from a URL.

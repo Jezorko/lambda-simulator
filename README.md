@@ -26,7 +26,7 @@ const handler = require('../index').handler;
 Additionally, if you're planning to proxy your requests through AWS Gateway, import the proxy:
 
 ```javascript
-const awsGatewayProxy = require('lambda-simulator').awsGatewayLambdaIntegrationProxy;
+const AwsGatewayLambdaIntegrationProxy = require('lambda-simulator').AwsGatewayLambdaIntegrationProxy;
 ```
 
 Finally, create the simulator in your test and add assertions:
@@ -34,7 +34,7 @@ Finally, create the simulator in your test and add assertions:
 ```javascript
 describe('my AWS Lambda handler', function() {
    
-    const simulator = new LambdaSimulator(handler, awsGatewayProxy); // proxy is optional
+    const simulator = new LambdaSimulator(handler, new AwsGatewayLambdaIntegrationProxy()); // proxy is optional
     
     it('should reply with status 200', async () => {
         // when:

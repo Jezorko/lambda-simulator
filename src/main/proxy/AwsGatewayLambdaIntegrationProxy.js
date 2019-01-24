@@ -1,22 +1,18 @@
-const LambdaResponse = require("./LambdaResponse").LambdaResponse;
+const LambdaSimulatorProxy = require('./LambdaSimulatorProxy').LambdaSimulatorProxy;
+const LambdaResponse = require('../LambdaResponse').LambdaResponse;
 
 /**
- * Allows request and response transformation.
- * The request transformation is applied in place of default body handling.
- * The response is transformed after it has been created by the Lambda Simulator.
+ * This {@link LambdaSimulatorProxy} mimics the behavior of AWS Gateway proxy integration.
+ * For more details, see {@link https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-create-api-as-simple-proxy-for-lambda.html}.
  */
-class LambdaSimulatorProxy {
-    /**
-     * @param {function} requestTransformer a function that accepts httpMethod, url, requestBody and queryParams and returns a response body
-     * @param {function} responseTransformer a function that accepts an instance of {LambdaResponse} and returns a transformed {LambdaResponse}
-     */
-    constructor(requestTransformer, responseTransformer) {
-        this.requestTransformer = requestTransformer;
-        this.responseTransformer = responseTransformer;
+class AwsGatewayLambdaIntegrationProxy extends LambdaSimulatorProxy {
+    constructor() {
+        super(
+            AwsGatewayLambdaIntegrationProxy.transformRequest,
+            AwsGatewayLambdaIntegrationProxy.transformResponse
+        )
     }
-}
 
-const awsGatewayLambdaIntegrationProxy = new LambdaSimulatorProxy(
     /**
      * @param {string} httpMethod HTTP method of this request
      * @param {string} url URL this request has been sent to
@@ -24,19 +20,20 @@ const awsGatewayLambdaIntegrationProxy = new LambdaSimulatorProxy(
      * @param {Object} queryParams an object where keys are query parameter names and values are their values
      * @returns {*} the transformed request object used as the event in AWS Lambda handler method
      */
-    (httpMethod, url, requestBody, queryParams) => {
+    static transformRequest(httpMethod, url, requestBody, queryParams) {
         return {
             httpMethod: httpMethod,
             path: url,
             body: JSON.stringify(requestBody),
             queryStringParameters: queryParams
         };
-    },
+    }
+
     /**
      * @param {LambdaResponse} response response from the handler method
      * @returns {LambdaResponse} the transformed response
      */
-    response => {
+    static transformResponse(response) {
         const body = response.body;
         try {
             return new LambdaResponse(
@@ -47,7 +44,8 @@ const awsGatewayLambdaIntegrationProxy = new LambdaSimulatorProxy(
             // For AWS Gateway, you need to JSON.stringify your body!
             return new LambdaResponse(502, 'malformed Lambda proxy response');
         }
-    });
+    }
 
+}
 
-module.exports = {LambdaSimulatorProxy, awsGatewayLambdaIntegrationProxy};
+module.exports = {AwsGatewayLambdaIntegrationProxy};
