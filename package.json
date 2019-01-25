@@ -17,7 +17,18 @@
     "route-parser": "^0.0.5"
   },
   "devDependencies": {
-    "mocha": "^5.2.0",
-    "sinon": "^7.2.3"
+    "jest": "^23.6.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "collectCoverage": true,
+    "collectCoverageFrom": [
+      "**/*.{js,jsx}"
+    ],
+    "coveragePathIgnorePatterns": [
+      "/node_modules",
+      "coverage",
+      "src/test"
+    ]
   }
 }
