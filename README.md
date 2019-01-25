@@ -1,4 +1,5 @@
 [![License: WTFPL](https://img.shields.io/badge/License-WTFPL-red.svg)](http://www.wtfpl.net/txt/copying/)
+[![Build status](https://travis-ci.org/Jezorko/lambda-simulator.svg?branch=master)](https://travis-ci.org/Jezorko/lambda-simulator)
 
 ## What is this?
 This is a simple project that allows you to unit test your AWS Lambda handlers.
