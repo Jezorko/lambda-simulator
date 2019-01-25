@@ -4,7 +4,7 @@
   "description": "AWS Lambda integration testing tool",
   "main": "src/main/index.js",
   "scripts": {
-    "test": "mocha './src/test/**.test.js' -R spec"
+    "test": "./node_modules/jest/bin/jest.js"
   },
   "license": "WTFPL",
   "repository": {
