@@ -1,7 +1,15 @@
 {
   "name": "lambda-simulator",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "AWS Lambda integration testing tool",
+  "keywords": [
+    "aws",
+    "amazon",
+    "lambda",
+    "test",
+    "bdd",
+    "tdd"
+  ],
   "main": "src/main/index.js",
   "scripts": {
     "test": "./node_modules/jest/bin/jest.js"
