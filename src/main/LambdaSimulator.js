@@ -176,7 +176,10 @@ class LambdaSimulator {
         console.log = oldConsoleLog;
         console.log(`END RequestId: ${context.awsRequestId}`);
         console.log(`REPORT RequestId: ${context.awsRequestId} Duration: ${duration} ms`);
-        let lambdaResponse = new LambdaResponse(200, responseBody);
+        let lambdaResponse = new LambdaResponse(200, responseBody, {
+            'X-Amzn-RequestId': context.awsRequestId,
+            'Content-Type': 'application/json',
+        });
         if (this.proxy) lambdaResponse = this.proxy.responseTransformer(lambdaResponse);
         return lambdaResponse;
     }
