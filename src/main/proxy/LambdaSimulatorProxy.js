@@ -7,7 +7,7 @@ const LambdaResponse = require('../LambdaResponse');
  */
 class LambdaSimulatorProxy {
     /**
-     * @param {function(string, string, *, *): *} requestTransformer a function that accepts httpMethod, url, requestBody and queryParams and returns a response body
+     * @param {function(string, string, *, *): *, *} requestTransformer a function that accepts httpMethod, url, requestBody and queryParams and returns a response body
      * @param {function(LambdaResponse): LambdaResponse} responseTransformer a function that accepts an instance of {LambdaResponse} and returns a transformed {LambdaResponse}
      */
     constructor(requestTransformer, responseTransformer) {

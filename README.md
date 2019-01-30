@@ -91,7 +91,6 @@ Very few. It merely mimics AWS Lambda and, therefore, will never be perfect.
 It's good enough for testing though.
 
 Stuff that is missing, from the top of my head:
- * headers handling
  * many fields when using the [AWS API Gateway proxy](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-create-api-as-simple-proxy-for-lambda.html)
  * other proxy implementations
  * memory allocation statistics (not sure if possible with Node) 

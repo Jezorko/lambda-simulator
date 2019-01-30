@@ -57,18 +57,18 @@ class LambdaSimulator {
                         console.log("fatal error: request body is empty");
                         bodyAsString = '{}';
                     }
-                    this.sendRequest(request.method, request.url, JSON.parse(bodyAsString))
+                    this.sendRequest(request.method, request.url, JSON.parse(bodyAsString), request.headers)
                         .then(result => {
                             response.statusCode = result.httpStatusCode;
-                            response.setHeader('Content-Type', 'application/json');
+                            Object.entries(result.headers).forEach(([name, value]) => response.setHeader(name, value));
                             response.end(JSON.stringify(result.body));
                         });
                 });
             } else {
-                this.sendGetRequest(request.url).then(result => {
+                this.sendGetRequest(request.url, request.headers).then(result => {
                     console.log(`result: ${result}`);
                     response.statusCode = result.httpStatusCode;
-                    response.setHeader('Content-Type', 'application/json');
+                    Object.entries(result.headers).forEach(([name, value]) => response.setHeader(name, value));
                     response.end(JSON.stringify(result.body))
                 })
             }
@@ -86,20 +86,22 @@ class LambdaSimulator {
     /**
      * Shorthand for sendRequest with 'GET' as the first parameter and an empty body.
      * @param {string} url to send the request to
+     * @param {*?} headers a string->string map containing the request headers
      * @returns {Promise<LambdaResponse>} the response from the AWS Lambda
      */
-    async sendGetRequest(url) {
-        return await this.sendRequest('GET', url, {});
+    async sendGetRequest(url, headers) {
+        return await this.sendRequest('GET', url, {}, headers);
     }
 
     /**
      * Shorthand for sendRequest with 'POST' as the first parameter.
      * @param {string} url to send the request to
      * @param {*} requestBody that will be sent as an event to AWS Lambda Handler
+     * @param {*?} headers a string->string map containing the request headers
      * @returns {Promise<LambdaResponse>} the response from the AWS Lambda
      */
-    async sendPostRequest(url, requestBody) {
-        return await this.sendRequest('POST', url, requestBody);
+    async sendPostRequest(url, requestBody, headers) {
+        return await this.sendRequest('POST', url, requestBody, headers);
     }
 
     /**
@@ -107,9 +109,10 @@ class LambdaSimulator {
      * @param {string} httpMethod to use with this request
      * @param {string} url to send the request to
      * @param {*} requestBody that will be sent as an event to AWS Lambda Handler
+     * @param {*?} headers a string->string map containing the request headers
      * @returns {Promise<LambdaResponse>} the response from the AWS Lambda
      */
-    async sendRequest(httpMethod, url, requestBody) {
+    async sendRequest(httpMethod, url, requestBody, headers) {
         const context = {
             functionName: 'lambda-simulator',
             functionVersion: '$LATEST',
@@ -131,7 +134,7 @@ class LambdaSimulator {
         const queryParams = getQueryParamsFromUrl(url);
         let event;
         if (this.proxy) {
-            event = this.proxy.requestTransformer(httpMethod, url, requestBody, queryParams);
+            event = this.proxy.requestTransformer(httpMethod, url, requestBody, queryParams, headers);
         } else {
             event = {
                 ...queryParams, // URL query params have lower priority and will be overwritten by request body

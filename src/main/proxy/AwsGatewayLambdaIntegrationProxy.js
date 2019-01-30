@@ -22,16 +22,24 @@ class AwsGatewayLambdaIntegrationRequestTransformer {
      * @param {string} url URL this request has been sent to
      * @param {Object} requestBody the JSON body of the request as an object
      * @param {Object} queryParams an object where keys are query parameter names and values are their values
+     * @param {Object} headers a map of 
      * @returns {Object} the transformed request object used as the event in AWS Lambda handler method
      */
-    transformRequest(httpMethod, url, requestBody, queryParams) {
+    transformRequest(httpMethod, url, requestBody, queryParams, headers) {
         const pathParameters = this.route.match(url);
         return {
             httpMethod: httpMethod,
             path: url,
             body: JSON.stringify(requestBody),
             pathParameters: pathParameters !== false ? pathParameters : {},
-            queryStringParameters: queryParams
+            queryStringParameters: queryParams,
+            headers: headers ? headers : {},
+            multiValueHeaders: headers
+                ? Object.entries(headers)
+                        .map(([name, values]) => [name, values.split(',').map(value => value.trim())])
+                        .map(([name, values]) => {const r = {}; r[name] = values; return r;})
+                        .reduce((previous, current) => ({...previous, ...current}), {})
+                : {}
         };
     }
 
@@ -51,11 +59,12 @@ class AwsGatewayLambdaIntegrationResponseTransformer {
         try {
             return new LambdaResponse(
                 body ? body.statusCode ? body.statusCode : 200 : 200,
-                body ? JSON.parse(body.body) : "ERROR: body is missing"
+                body ? JSON.parse(body.body) : "ERROR: body is missing",
+                body ? body.headers : {}
             );
         } catch (e) {
             // For AWS Gateway, you need to JSON.stringify your body!
-            return new LambdaResponse(502, 'malformed Lambda proxy response');
+            return new LambdaResponse(502, 'malformed Lambda proxy response', response.headers);
         }
     }
 

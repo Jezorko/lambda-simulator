@@ -1,15 +1,4 @@
 /**
- *
- * @param {{string}} arg
- */
-function test(arg) {
-
-}
-
-test({bla: "bla"});
-
-
-/**
  * Simple wrapper over a response from Lambda, to be used internally.
  * Do NOT use it in your handler method!
  */

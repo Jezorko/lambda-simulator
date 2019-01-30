@@ -62,6 +62,38 @@ describe(AwsGatewayLambdaIntegrationProxy.name, function () {
             assert.deepStrictEqual(result.queryStringParameters, testQueryParameters);
         });
 
+        it('should put all headers in a "headers" event field and multi value headers in "multiValueHeaders" field', () => {
+            // given:
+            const testRequestHeaders = {
+                singleValueHeader: 'test/bla',
+                multiValueHeader: 'first, second, test/third'
+            };
+            const testHeadersAsMultiValueHeaders = {
+                singleValueHeader: ['test/bla'],
+                multiValueHeader: ['first', 'second', 'test/third']
+            };
+
+            // when:
+            const result = simpleProxy.requestTransformer('ANY', '', {}, {}, testRequestHeaders);
+
+            // then:
+            assert.deepStrictEqual(result.headers, testRequestHeaders);
+            assert.deepStrictEqual(result.multiValueHeaders, testHeadersAsMultiValueHeaders);
+        });
+
+        it('should not put any headers if there are none', () => {
+            // given:
+            const testRequestHeaders = {};
+            const testHeadersAsMultiValueHeaders = {};
+
+            // when:
+            const result = simpleProxy.requestTransformer('ANY', '', {}, {}, testRequestHeaders);
+
+            // then:
+            assert.deepStrictEqual(result.headers, testRequestHeaders);
+            assert.deepStrictEqual(result.multiValueHeaders, testHeadersAsMultiValueHeaders);
+        });
+
     });
 
     describe('responseTransformer', () => {
