@@ -143,6 +143,20 @@ describe(AwsGatewayLambdaIntegrationProxy.name, function () {
             assert.deepStrictEqual(result.body, testBody);
         });
 
+        it('should remove AWS logs and version headers', () => {
+            // given:
+            const testHeaders = {
+                'X-Amz-Log-Results': 'testLogHeader',
+                'X-Amz-Executed-Version': 'testVersionHeader'
+            };
+
+            // when:
+            const result = simpleProxy.responseTransformer(new LambdaResponse(200, {body: '{}'}, testHeaders));
+
+            // then:
+            assert.deepStrictEqual(result.headers, {});
+        });
+
     });
 
 
