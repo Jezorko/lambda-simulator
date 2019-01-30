@@ -2,6 +2,7 @@ const http = require('http');
 const uuidv4 = require('uuid/v4');
 const LambdaResponse = require('./LambdaResponse').LambdaResponse;
 const LambdaSimulatorProxy = require('./proxy/LambdaSimulatorProxy').LambdaSimulatorProxy;
+const Base64 = require('js-base64').Base64;
 
 /**
  * Extracts query parameters from a URL.
@@ -57,18 +58,18 @@ class LambdaSimulator {
                         console.log("fatal error: request body is empty");
                         bodyAsString = '{}';
                     }
-                    this.sendRequest(request.method, request.url, JSON.parse(bodyAsString))
+                    this.sendRequest(request.method, request.url, JSON.parse(bodyAsString), request.headers)
                         .then(result => {
                             response.statusCode = result.httpStatusCode;
-                            response.setHeader('Content-Type', 'application/json');
+                            Object.entries(result.headers).forEach(([name, value]) => response.setHeader(name, value));
                             response.end(JSON.stringify(result.body));
                         });
                 });
             } else {
-                this.sendGetRequest(request.url).then(result => {
+                this.sendGetRequest(request.url, request.headers).then(result => {
                     console.log(`result: ${result}`);
                     response.statusCode = result.httpStatusCode;
-                    response.setHeader('Content-Type', 'application/json');
+                    Object.entries(result.headers).forEach(([name, value]) => response.setHeader(name, value));
                     response.end(JSON.stringify(result.body))
                 })
             }
@@ -86,20 +87,22 @@ class LambdaSimulator {
     /**
      * Shorthand for sendRequest with 'GET' as the first parameter and an empty body.
      * @param {string} url to send the request to
+     * @param {*?} headers a string->string map containing the request headers
      * @returns {Promise<LambdaResponse>} the response from the AWS Lambda
      */
-    async sendGetRequest(url) {
-        return await this.sendRequest('GET', url, {});
+    async sendGetRequest(url, headers) {
+        return await this.sendRequest('GET', url, {}, headers);
     }
 
     /**
      * Shorthand for sendRequest with 'POST' as the first parameter.
      * @param {string} url to send the request to
      * @param {*} requestBody that will be sent as an event to AWS Lambda Handler
+     * @param {*?} headers a string->string map containing the request headers
      * @returns {Promise<LambdaResponse>} the response from the AWS Lambda
      */
-    async sendPostRequest(url, requestBody) {
-        return await this.sendRequest('POST', url, requestBody);
+    async sendPostRequest(url, requestBody, headers) {
+        return await this.sendRequest('POST', url, requestBody, headers);
     }
 
     /**
@@ -107,22 +110,28 @@ class LambdaSimulator {
      * @param {string} httpMethod to use with this request
      * @param {string} url to send the request to
      * @param {*} requestBody that will be sent as an event to AWS Lambda Handler
+     * @param {*?} headers a string->string map containing the request headers
      * @returns {Promise<LambdaResponse>} the response from the AWS Lambda
      */
-    async sendRequest(httpMethod, url, requestBody) {
+    async sendRequest(httpMethod, url, requestBody, headers) {
         const context = {
             functionName: 'lambda-simulator',
             functionVersion: '$LATEST',
             awsRequestId: uuidv4()
         };
 
-        console.log(`START RequestId: ${context.awsRequestId} Version: ${context.functionVersion}`);
+        let startLog = `START RequestId: ${context.awsRequestId} Version: ${context.functionVersion}`;
+        console.log(startLog);
+        const logs = [startLog];
+
         const oldConsoleLog = console.log;
         console.log = (...params) => {
             const message = params[0];
             if (typeof message === 'string') {
+                logs.push(params.slice(1).map(JSON.stringify).reduce((a,b) => a + "\t" + b, `${new Date().toISOString()} ${context.awsRequestId} ${message}`));
                 oldConsoleLog(`${new Date().toISOString()} ${context.awsRequestId} ${message}`, ...(params.slice(1)));
             } else {
+                logs.push(params.map(JSON.stringify).reduce((a,b) => a + "\t" + b, `${new Date().toISOString()} ${context.awsRequestId}`));
                 oldConsoleLog(`${new Date().toISOString()} ${context.awsRequestId}`, message, ...(params.slice(1)));
             }
         };
@@ -131,7 +140,7 @@ class LambdaSimulator {
         const queryParams = getQueryParamsFromUrl(url);
         let event;
         if (this.proxy) {
-            event = this.proxy.requestTransformer(httpMethod, url, requestBody, queryParams);
+            event = this.proxy.requestTransformer(httpMethod, url, requestBody, queryParams, headers);
         } else {
             event = {
                 ...queryParams, // URL query params have lower priority and will be overwritten by request body
@@ -174,9 +183,18 @@ class LambdaSimulator {
         const lambdaEndTime = new Date();
         const duration = lambdaEndTime - lambdaStartTime;
         console.log = oldConsoleLog;
-        console.log(`END RequestId: ${context.awsRequestId}`);
-        console.log(`REPORT RequestId: ${context.awsRequestId} Duration: ${duration} ms`);
-        let lambdaResponse = new LambdaResponse(200, responseBody);
+        let endLog = `END RequestId: ${context.awsRequestId}`;
+        console.log(endLog);
+        logs.push(endLog);
+        let reportLog = `REPORT RequestId: ${context.awsRequestId} Duration: ${duration} ms`;
+        console.log(reportLog);
+        logs.push(reportLog);
+        let lambdaResponse = new LambdaResponse(200, responseBody, {
+            'X-Amzn-RequestId': context.awsRequestId,
+            'Content-Type': 'application/json',
+            'X-Amz-Log-Results': Base64.encode(logs.reduce((a, b) => a + '\n' + b, '')),
+            'X-Amz-Executed-Version': context.functionVersion
+        });
         if (this.proxy) lambdaResponse = this.proxy.responseTransformer(lambdaResponse);
         return lambdaResponse;
     }

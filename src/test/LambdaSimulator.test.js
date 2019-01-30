@@ -108,11 +108,25 @@ describe(LambdaSimulator.name, function () {
             if (dataSet.validateResult) {
                 dataSet.validateResult(actualResult);
             } else if (dataSet.expectedResult) {
-                assert.deepStrictEqual(actualResult, dataSet.expectedResult);
+                assert.deepStrictEqual(actualResult.httpStatusCode, dataSet.expectedResult.httpStatusCode);
+                assert.deepStrictEqual(actualResult.body, dataSet.expectedResult.body);
             } else {
                 throw new Error('test case must define either a result validation function or an expected result');
             }
-        }))
+        }));
+
+        it('should append default headers to the response', async () => {
+            // given:
+            const eventHandler = () => undefined;
+            const simulator = new LambdaSimulator(eventHandler);
+
+            // when:
+            const actualResult = await simulator.sendRequest('GET', '/', {});
+
+            // then:
+            assert.strictEqual(actualResult.headers['Content-Type'], 'application/json');
+            assert(!!actualResult.headers['X-Amzn-RequestId']);
+        });
 
     })
 

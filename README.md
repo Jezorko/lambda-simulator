@@ -15,7 +15,7 @@ First, add the project as a test dependency in `package.json` file:
 
 ```json
 "devDependencies": {
-    "lambda-simulator": "^0.0.3"
+    "lambda-simulator": "^0.0.4"
     ...
 }
 ```
@@ -42,7 +42,7 @@ describe('my AWS Lambda handler', function() {
     
     it('should reply with status 200', async () => {
         // when:
-        const response = await simulator.sendPostRequest('/', { someField: "someValue" });
+        const response = await simulator.sendPostRequest('/', { someField: 'someValue' }, { someHeader: 'someHeaderValue' });
         
         // then:
         assert.deepStrictEqual(response.httpStatusCode, 200);
@@ -52,7 +52,7 @@ describe('my AWS Lambda handler', function() {
 ```
 
 #### Path parameters
-If you'd like the path parameters to be parsed by the AwsGatewayLambdaIntegrationProxy, you need to provide a URL template.
+If you'd like the path parameters to be parsed by the `AwsGatewayLambdaIntegrationProxy`, you need to provide a URL template.
 For example this proxy object:
 
 ```javascript
@@ -68,6 +68,11 @@ Will yield the following pathParameters object in your Lambda:
 }
 ```
 
+#### Headers
+The `AwsGatewayLambdaIntegrationProxy` will handle headers passed in the request in two ways.
+First, all headers will be available in `event.headers` field, unchanged.
+Additionally, all headers will be split by comma and available in `event.multiValueHeaders` field.
+
 ### Manual testing
 If you'd like to test your Lambda manually, start the `LambdaSimulator` server by calling the `listen` method:
 
@@ -82,6 +87,7 @@ Now, you can send requests directly to your Lambda:
 
 ```bash
 curl -vsX POST \
+     -H 'Content-Type:application/json' \
      -d '{"testVariable": "testValue"}' \
      'http://localhost:3000/test?testQueryParam=testValue'
 ```
@@ -91,7 +97,6 @@ Very few. It merely mimics AWS Lambda and, therefore, will never be perfect.
 It's good enough for testing though.
 
 Stuff that is missing, from the top of my head:
- * headers handling
  * many fields when using the [AWS API Gateway proxy](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-create-api-as-simple-proxy-for-lambda.html)
  * other proxy implementations
  * memory allocation statistics (not sure if possible with Node) 
