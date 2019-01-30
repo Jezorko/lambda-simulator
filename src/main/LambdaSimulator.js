@@ -2,6 +2,7 @@ const http = require('http');
 const uuidv4 = require('uuid/v4');
 const LambdaResponse = require('./LambdaResponse').LambdaResponse;
 const LambdaSimulatorProxy = require('./proxy/LambdaSimulatorProxy').LambdaSimulatorProxy;
+const Base64 = require('js-base64').Base64;
 
 /**
  * Extracts query parameters from a URL.
@@ -119,13 +120,18 @@ class LambdaSimulator {
             awsRequestId: uuidv4()
         };
 
-        console.log(`START RequestId: ${context.awsRequestId} Version: ${context.functionVersion}`);
+        let startLog = `START RequestId: ${context.awsRequestId} Version: ${context.functionVersion}`;
+        console.log(startLog);
+        const logs = [startLog];
+
         const oldConsoleLog = console.log;
         console.log = (...params) => {
             const message = params[0];
             if (typeof message === 'string') {
+                logs.push(params.slice(1).map(JSON.stringify).reduce((a,b) => a + "\t" + b, `${new Date().toISOString()} ${context.awsRequestId} ${message}`));
                 oldConsoleLog(`${new Date().toISOString()} ${context.awsRequestId} ${message}`, ...(params.slice(1)));
             } else {
+                logs.push(params.map(JSON.stringify).reduce((a,b) => a + "\t" + b, `${new Date().toISOString()} ${context.awsRequestId}`));
                 oldConsoleLog(`${new Date().toISOString()} ${context.awsRequestId}`, message, ...(params.slice(1)));
             }
         };
@@ -177,11 +183,17 @@ class LambdaSimulator {
         const lambdaEndTime = new Date();
         const duration = lambdaEndTime - lambdaStartTime;
         console.log = oldConsoleLog;
-        console.log(`END RequestId: ${context.awsRequestId}`);
-        console.log(`REPORT RequestId: ${context.awsRequestId} Duration: ${duration} ms`);
+        let endLog = `END RequestId: ${context.awsRequestId}`;
+        console.log(endLog);
+        logs.push(endLog);
+        let reportLog = `REPORT RequestId: ${context.awsRequestId} Duration: ${duration} ms`;
+        console.log(reportLog);
+        logs.push(reportLog);
         let lambdaResponse = new LambdaResponse(200, responseBody, {
             'X-Amzn-RequestId': context.awsRequestId,
             'Content-Type': 'application/json',
+            'X-Amz-Log-Results': Base64.encode(logs.reduce((a, b) => a + '\n' + b, '')),
+            'X-Amz-Executed-Version': context.functionVersion
         });
         if (this.proxy) lambdaResponse = this.proxy.responseTransformer(lambdaResponse);
         return lambdaResponse;
