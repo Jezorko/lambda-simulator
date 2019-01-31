@@ -4,8 +4,6 @@ const LambdaSimulatorProxy = require('./proxy/LambdaSimulatorProxy').LambdaSimul
 const AwsGatewayLambdaIntegrationProxy = require('./proxy/AwsGatewayLambdaIntegrationProxy').AwsGatewayLambdaIntegrationProxy;
 const awsGatewayLambdaIntegrationProxy = new AwsGatewayLambdaIntegrationProxy(); // deprecated, only for backwards compatibility, TODO: remove in the future
 
-new LambdaSimulator(event => {console.log('bla'); return {body:'{}'}}, awsGatewayLambdaIntegrationProxy).listen(3000);
-
 module.exports = {
     LambdaSimulator,
     LambdaResponse,
