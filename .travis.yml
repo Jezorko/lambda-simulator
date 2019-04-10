@@ -1,6 +1,19 @@
 language: node_js
 node_js:
-  - "node"
+- node
+
+env:
+  global:
+    secure: ibb8Mk63NFtch7vST3WoLqmqHghVVqTJKPT7eAdn+DWWNBBwrhmXFqPz1Mv5G6Pw1UUShoWQXiw0xNHfts8BsM2LWMPrJ4FoPt/IYhqiLIbm8m1BR1qlUzo8RBa4ZoYcDQTtEp3/0Bqg+Al9JTCAW7z31a7Rh33LbtbMzlt2NjgHCBp3jg20GOIjHUMVvvsrHBVUkXLckCafjBYFU4yuyMH+I9ZsdFlL47au33SW9j3iRE3RTxF/DWB9RbQEHgHIJQfSmrI/iFeBiXrbxrrGeZiRw1D33G9Nzqkzmmmf4GOGxgbYOVVM79F4+0S6IUC4MVbY5hB73LZ7hZX30NpfsRVBeRVxN5xvsmrbMqzFc3ECObFm484x9Cg0xa+FJI4vprkTpJggZ297Z8sslsiDy8R5MaAPuuNsmQCd7uzCEeJpkXHA6cNYUebJ1XT4o857LO1GLMVv4E29NZbNgxZB7UtYDH9wBbtRyYEoqmOo3d/jpiIx3sGJOmDVfPgrktXp57FVPukC+9EQoyMJvecK/XGWAnJakoqSpIhQXwyoJE0OojP/avE0biaGfrYDT/oCjpp/yRqaC+vOy+uyCqxt26S/J3lSYu68EohM68sik82s9K8OoucF0dtTEB+kzDinx5g4kmhLHEv6amjTPTKvWK+g6gDjZGbDaBg95oOE2fI=
 
 before_install:
   - npm install
+
+jobs:
+  include:
+    - stage: test
+      script: npm test
+    - stage: deploy
+      if: branch = master
+      script: npm config set '//registry.npmjs.org/:_authToken' "${NPM_TOKEN}" && npm publish
+
