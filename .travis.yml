@@ -14,6 +14,6 @@ jobs:
     - stage: test
       script: npm test
     - stage: deploy
-      if: (branch = master) AND (NOT (type IN (push, pull_request)))
+      if: (branch = master) AND (NOT (type IN (pull_request)))
       script: npm config set '//registry.npmjs.org/:_authToken' "${NPM_TOKEN}" && npm publish
 
