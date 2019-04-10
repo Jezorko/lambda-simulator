@@ -11,9 +11,9 @@ before_install:
 
 jobs:
   include:
-    - test
+    - stage: test
       script: npm test
-    - deploy
-      if: branch = master
+    - stage: deploy
+      if: (branch = master) AND (NOT (type IN (push, pull_request)))
       script: npm config set '//registry.npmjs.org/:_authToken' "${NPM_TOKEN}" && npm publish
 
