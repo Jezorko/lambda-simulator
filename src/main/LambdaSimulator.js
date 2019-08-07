@@ -117,7 +117,8 @@ class LambdaSimulator {
         const context = {
             functionName: 'lambda-simulator',
             functionVersion: '$LATEST',
-            awsRequestId: uuidv4()
+            awsRequestId: uuidv4(),
+            succeed: () => {}, // Stub out to test older lambdas
         };
 
         let startLog = `START RequestId: ${context.awsRequestId} Version: ${context.functionVersion}`;
@@ -156,7 +157,7 @@ class LambdaSimulator {
             if (error)
                 finalError = {errorMessage: "" + error};
             else
-                finalResult = JSON.parse(JSON.stringify(result));
+                finalResult = (result) ? JSON.parse(JSON.stringify(result)) : finalResult;
         };
 
         const lambdaStartTime = new Date();
