@@ -164,7 +164,7 @@ class LambdaSimulator {
         try {
             const result = await this.handler(event, context, callback);
             // in case the async callback already set either of these
-            if (!finalResult) finalResult = JSON.parse(JSON.stringify(result));
+            if (!finalResult) finalResult = (result) ? JSON.parse(JSON.stringify(result)) : finalResult;
         } catch (error) {
             // in case the async callback already set either of these
             if (!finalError && !finalResult) {
