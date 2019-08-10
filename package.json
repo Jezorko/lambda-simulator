@@ -1,6 +1,6 @@
 {
   "name": "lambda-simulator",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "AWS Lambda integration testing tool",
   "keywords": [
     "aws",
@@ -20,7 +20,7 @@
     "url": "git://github.com/Jezorko/`lambda-simulator`.git"
   },
   "dependencies": {
-    "node": "^12.4.0",
+    "node": "^12.8.0",
     "uuid": "^3.3.2",
     "route-parser": "^0.0.5",
     "js-base64": "^2.5.1"
