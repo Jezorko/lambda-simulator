@@ -15,7 +15,7 @@ First, add the project as a test dependency in `package.json` file:
 
 ```json
 "devDependencies": {
-    "lambda-simulator": "^0.0.10"
+    "lambda-simulator": "^0.0.11"
     ...
 }
 ```
