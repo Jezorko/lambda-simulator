@@ -117,7 +117,8 @@ class LambdaSimulator {
         const context = {
             functionName: 'lambda-simulator',
             functionVersion: '$LATEST',
-            awsRequestId: uuidv4()
+            awsRequestId: uuidv4(),
+            succeed: () => {}, // Stub out to test older lambdas
         };
 
         let startLog = `START RequestId: ${context.awsRequestId} Version: ${context.functionVersion}`;
@@ -156,14 +157,14 @@ class LambdaSimulator {
             if (error)
                 finalError = {errorMessage: "" + error};
             else
-                finalResult = JSON.parse(JSON.stringify(result));
+                finalResult = (result) ? JSON.parse(JSON.stringify(result)) : finalResult;
         };
 
         const lambdaStartTime = new Date();
         try {
             const result = await this.handler(event, context, callback);
             // in case the async callback already set either of these
-            if (!finalResult) finalResult = JSON.parse(JSON.stringify(result));
+            if (!finalResult) finalResult = (result) ? JSON.parse(JSON.stringify(result)) : finalResult;
         } catch (error) {
             // in case the async callback already set either of these
             if (!finalError && !finalResult) {

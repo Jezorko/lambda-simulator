@@ -76,7 +76,6 @@ describe(LambdaSimulator.name, function () {
                     }
                 }
             },
-
             {
                 get testCaseDescription() {
                     return `should prioritize result from callback over thrown error`
@@ -95,6 +94,42 @@ describe(LambdaSimulator.name, function () {
                 },
                 get expectedResult() {
                     return new LambdaResponse(200, this.request.body)
+                }
+            },
+            {
+                get testCaseDescription() {
+                    return `should not throw error if older lambda style`
+                },
+                error: new Error('test'),
+                get eventHandler() {
+                    return async (event, context) => {
+                        context.succeed();
+                    }
+                },
+                request: {
+                    url: '/',
+                    method: 'POST',
+                    body: {field: "value"}
+                },
+                get expectedResult() {
+                    return new LambdaResponse(200)
+                }
+            },
+            {
+                get testCaseDescription() {
+                    return `should not throw error if no return given`
+                },
+                error: new Error('test'),
+                get eventHandler() {
+                    return async (event, context) => {}
+                },
+                request: {
+                    url: '/',
+                    method: 'POST',
+                    body: {field: "value"}
+                },
+                get expectedResult() {
+                    return new LambdaResponse(200)
                 }
             }
         ].forEach(dataSet => it(dataSet.testCaseDescription, async () => {
