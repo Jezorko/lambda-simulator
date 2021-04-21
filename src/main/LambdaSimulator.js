@@ -1,5 +1,5 @@
 const http = require('http');
-const uuidv4 = require('uuid/v4');
+const uuidv4 = require('uuid').v4;
 const LambdaResponse = require('./LambdaResponse').LambdaResponse;
 const LambdaSimulatorProxy = require('./proxy/LambdaSimulatorProxy').LambdaSimulatorProxy;
 const Base64 = require('js-base64').Base64;
