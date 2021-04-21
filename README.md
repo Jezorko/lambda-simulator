@@ -1,5 +1,6 @@
 [![License: WTFPL](https://img.shields.io/badge/License-WTFPL-red.svg)](http://www.wtfpl.net/txt/copying/)
 [![Build status](https://travis-ci.org/Jezorko/lambda-simulator.svg?branch=master)](https://travis-ci.org/Jezorko/lambda-simulator)
+[![Most recent version in NPM](https://img.shields.io/npm/v/lambda-simulator.svg)](https://www.npmjs.com/package/lambda-simulator)
 
 ## What is this?
 This is a simple project that allows you to unit test your AWS Lambda handlers.
@@ -11,11 +12,11 @@ This would be a terrible idea.
 ## How do I use it?
 
 ### Unit testing
-First, add the project as a test dependency in `package.json` file:
+First, add the project as a test dependency in `package.json` file (see most recent version in [npm](https://www.npmjs.com/package/lambda-simulator)):
 
 ```json
 "devDependencies": {
-    "lambda-simulator": "^0.0.11"
+    "lambda-simulator": "^version"
     ...
 }
 ```
