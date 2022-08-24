@@ -139,9 +139,12 @@ class LambdaSimulator {
 
         // simulate sending body via wire
         const queryParams = getQueryParamsFromUrl(url);
+
+        // The querystring is omitted from the path parameter in API Gateway
+        const urlWithoutQuerystring = url.split('?')[0];
         let event;
         if (this.proxy) {
-            event = this.proxy.requestTransformer(httpMethod, url, requestBody, queryParams, headers);
+            event = this.proxy.requestTransformer(httpMethod, urlWithoutQuerystring, requestBody, queryParams, headers);
         } else {
             event = {
                 ...queryParams, // URL query params have lower priority and will be overwritten by request body
