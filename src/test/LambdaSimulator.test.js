@@ -2,6 +2,7 @@ const LambdaSimulator = require("../main/LambdaSimulator").LambdaSimulator;
 const LambdaResponse = require("../main/LambdaSimulator").LambdaResponse;
 
 const assert = require("assert");
+const { AwsGatewayLambdaIntegrationProxy } = require('../main/proxy/AwsGatewayLambdaIntegrationProxy.js');
 
 describe(LambdaSimulator.name, function () {
 
@@ -22,7 +23,36 @@ describe(LambdaSimulator.name, function () {
                     return new LambdaResponse(200, this.request.body)
                 }
             },
-
+            {
+                get testCaseDescription() {
+                    return `should leave query params separate from path when parsing requests through AwsGatewayLambdaIntegrationProxy`
+                },
+                eventHandler: async event => {
+                    return {
+                        statusCode: 200,
+                        body: JSON.stringify(event),
+                        headers: {},
+                    };
+                },
+                request: {
+                    url: '/birds/hawks/123456asdf?hawk=1&bird=2&cat=feline',
+                    method: 'GET',
+                },
+                expectedOutput: {
+                    path: '/birds/hawks/123456asdf',
+                    pathParameters: {},
+                    queryString: {"bird": "2", "cat": "feline", "hawk": "1"}
+                },
+                proxy: new AwsGatewayLambdaIntegrationProxy(),
+                get validateResult() {
+                    return actualResult => {
+                        assert.strictEqual(actualResult.body?.body, undefined);
+                        assert.strictEqual(actualResult.body?.path, this.expectedOutput.path);
+                        assert.deepStrictEqual(actualResult.body?.pathParameters, this.expectedOutput.pathParameters);
+                        assert.deepStrictEqual(actualResult.body?.queryStringParameters, this.expectedOutput.queryString);
+                    }
+                }
+            },
             {
                 get testCaseDescription() {
                     return `should ignore query params with same names as body fields`
@@ -134,7 +164,7 @@ describe(LambdaSimulator.name, function () {
             }
         ].forEach(dataSet => it(dataSet.testCaseDescription, async () => {
             // given:
-            const simulator = new LambdaSimulator(dataSet.eventHandler);
+            const simulator = new LambdaSimulator(dataSet.eventHandler, dataSet.proxy || null);
 
             // when:
             const actualResult = await simulator.sendRequest(dataSet.request.method, dataSet.request.url, dataSet.request.body);

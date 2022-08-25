@@ -1,6 +1,6 @@
 {
   "name": "lambda-simulator",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "description": "AWS Lambda integration testing tool",
   "keywords": [
     "aws",
@@ -17,7 +17,7 @@
   "license": "WTFPL",
   "repository": {
     "type": "git",
-    "url": "git://github.com/Jezorko/`lambda-simulator`.git"
+    "url": "git://github.com/Jezorko/lambda-simulator.git"
   },
   "dependencies": {
     "js-base64": "^3.6.0",
