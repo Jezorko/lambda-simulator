@@ -1,5 +1,5 @@
 [![License: WTFPL](https://img.shields.io/badge/License-WTFPL-red.svg)](http://www.wtfpl.net/txt/copying/)
-[![Deployment Status](https://img.shields.io/github/workflow/status/Jezorko/lambda-simulator/Deploy%20to%20NPM?label=Deployment&logo=npm&logoColor=red)](https://github.com/Jezorko/lambda-simulator/workflows/deploy.yml)
+[![Deployment Status](https://img.shields.io/github/workflow/status/Jezorko/lambda-simulator/Deploy%20to%20NPM?label=Deployment&logo=npm&logoColor=red)](https://github.com/Jezorko/lambda-simulator/actions/workflows/deploy.yml)
 [![Tests](https://img.shields.io/github/workflow/status/Jezorko/lambda-simulator/Run%20all%20tests?label=Tests&logo=jest&logoColor=red)](https://github.com/Jezorko/lambda-simulator/actions/workflows/test.yml)
 [![Most recent version in NPM](https://img.shields.io/npm/v/lambda-simulator.svg)](https://www.npmjs.com/package/lambda-simulator)
 
