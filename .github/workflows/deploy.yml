@@ -1,0 +1,28 @@
+name: Deploy to NPM
+
+on:
+  workflow_run:
+    workflows: [ "Run all tests" ]
+    branches: [ master ]
+    types:
+      - completed
+
+env:
+  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+      - name: Setup NodeJS
+        uses: actions/setup-node@v3
+        with:
+          node-version: 17
+      - name: Run all tests
+        run: npm test
+      - name: Set deployment token
+        run: npm config set '//registry.npmjs.org/:_authToken' "${NPM_TOKEN}"
+      - name: Deploy to NPM
+        run: npm publish
