@@ -158,18 +158,19 @@ describe(AwsGatewayLambdaIntegrationProxy.name, function () {
             assert.deepStrictEqual(result.headers, {});
         });
 
-        it('should return allow a base64 encoded response', () => {
+        it('should allow a gzipped response with base64 encoding set', () => {
             //given:
             const testBody = JSON.stringify({
                 foo: "bar"
             });
             const testGzipped = zlib.gzipSync(JSON.stringify(testBody)).toString("base64");
 
-            //when
+            //when:
             const result = simpleProxy.responseTransformer(new LambdaResponse(200, {body: testGzipped, isBase64Encoded: true}));
             
             //then:
-            assert.deepStrictEqual(result.body, testGzipped);
+            const ungzipped = JSON.parse(zlib.gunzipSync(result.body).toString());
+            assert.deepStrictEqual(JSON.parse(ungzipped), JSON.parse(testBody));
         })
 
     });

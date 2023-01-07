@@ -70,7 +70,11 @@ class AwsGatewayLambdaIntegrationResponseTransformer {
                 case true: {
                     return new LambdaResponse(
                         body ? (body.statusCode ? body.statusCode : 200) : 200,
-                        body ? body.body : "ERROR: body is missing",
+                        body
+                            ? Buffer.from(body.body, "base64")
+                            : Buffer.from(
+                                    "H4sIAAAAAAAAA3MNCvIPslJIyk+pVMgsVsjNLC7OzEvnAgCkHl3SFwAAAA==", "base64" //Gzipped version of ERROR: body is missing
+                                ),
                         body
                             ? body.headers
                                 ? { ...body.headers, ...response.headers }

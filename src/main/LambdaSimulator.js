@@ -62,7 +62,12 @@ class LambdaSimulator {
                         .then(result => {
                             response.statusCode = result.httpStatusCode;
                             Object.entries(result.headers).forEach(([name, value]) => response.setHeader(name, value));
-                            response.end(JSON.stringify(result.body));
+
+                            if(response.getHeader("Content-Encoding")) {
+                                response.end(result.body)
+                            } else {
+                                response.end(JSON.stringify(result.body));
+                            }
                         });
                 });
             } else {
@@ -70,7 +75,12 @@ class LambdaSimulator {
                     console.log(`result: ${result}`);
                     response.statusCode = result.httpStatusCode;
                     Object.entries(result.headers).forEach(([name, value]) => response.setHeader(name, value));
-                    response.end(JSON.stringify(result.body))
+                    if (response.getHeader("Content-Encoding")) {
+                        console.log("has content encoding");
+                        response.end(result.body);
+                    } else {
+                        response.end(JSON.stringify(result.body));
+                    }
                 })
             }
 
