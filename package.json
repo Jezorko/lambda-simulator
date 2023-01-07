@@ -1,55 +1,57 @@
 {
-  "name": "lambda-simulator",
-  "version": "0.0.16",
-  "description": "AWS Lambda integration testing tool",
-  "keywords": [
-    "aws",
-    "amazon",
-    "lambda",
-    "test",
-    "bdd",
-    "tdd"
-  ],
-  "main": "src/main/index.js",
-  "scripts": {
-    "test": "./node_modules/jest/bin/jest.js"
-  },
-  "license": "WTFPL",
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/Jezorko/lambda-simulator.git"
-  },
-  "dependencies": {
-    "js-base64": "^3.7.2",
-    "node": "^16.17.0",
-    "route-parser": "^0.0.5",
-    "uuid": "^8.3.2"
-  },
-  "devDependencies": {
-    "jest": "^29.0.2"
-  },
-  "jest": {
-    "testEnvironment": "node",
-    "coverageReporters": [
-      "text-summary",
-      "html"
-    ],
-    "collectCoverage": true,
-    "collectCoverageFrom": [
-      "**/*.{js,jsx}"
-    ],
-    "coveragePathIgnorePatterns": [
-      "/node_modules",
-      "coverage",
-      "src/test"
-    ],
-    "coverageThreshold": {
-      "global": {
-        "statements": 63,
-        "branches": 61,
-        "functions": 59,
-        "lines": 67
-      }
-    }
-  }
+	"name": "lambda-simulator",
+	"version": "0.0.16",
+	"description": "AWS Lambda integration testing tool",
+	"keywords": [
+		"aws",
+		"amazon",
+		"lambda",
+		"test",
+		"bdd",
+		"tdd"
+	],
+	"main": "src/main/index.js",
+	"scripts": {
+		"test": "./node_modules/jest/bin/jest.js"
+	},
+	"engines": {
+		"node": "^16.17.0"
+	},
+	"license": "WTFPL",
+	"repository": {
+		"type": "git",
+		"url": "git://github.com/Jezorko/lambda-simulator.git"
+	},
+	"dependencies": {
+		"js-base64": "^3.7.2",
+		"route-parser": "^0.0.5",
+		"uuid": "^8.3.2"
+	},
+	"devDependencies": {
+		"jest": "^29.0.2"
+	},
+	"jest": {
+		"testEnvironment": "node",
+		"coverageReporters": [
+			"text-summary",
+			"html"
+		],
+		"collectCoverage": true,
+		"collectCoverageFrom": [
+			"**/*.{js,jsx}"
+		],
+		"coveragePathIgnorePatterns": [
+			"/node_modules",
+			"coverage",
+			"src/test"
+		],
+		"coverageThreshold": {
+			"global": {
+				"statements": 63,
+				"branches": 61,
+				"functions": 59,
+				"lines": 67
+			}
+		}
+	}
 }
