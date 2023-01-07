@@ -62,12 +62,35 @@ class AwsGatewayLambdaIntegrationResponseTransformer {
         const body = response.body;
         delete response.headers['X-Amz-Log-Results'];
         delete response.headers['X-Amz-Executed-Version'];
+
+        let isBase64Encoded = body.isBase64Encoded || false;
+
         try {
-            return new LambdaResponse(
-                body ? body.statusCode ? body.statusCode : 200 : 200,
-                body ? JSON.parse(body.body) : "ERROR: body is missing",
-                body ? body.headers ? {...body.headers, ...response.headers} : response.headers : response.headers
-            );
+            switch(isBase64Encoded) {
+                case true: {
+                    return new LambdaResponse(
+                        body ? (body.statusCode ? body.statusCode : 200) : 200,
+                        body ? body.body : "ERROR: body is missing",
+                        body
+                            ? body.headers
+                                ? { ...body.headers, ...response.headers }
+                                : response.headers
+                            : response.headers
+                    );
+                };
+
+                case false : {
+                    return new LambdaResponse(
+                        body ? (body.statusCode ? body.statusCode : 200) : 200,
+                        body ? JSON.parse(body.body) : "ERROR: body is missing",
+                        body
+                            ? body.headers
+                                ? { ...body.headers, ...response.headers }
+                                : response.headers
+                            : response.headers
+                    );
+                }
+            }            
         } catch (e) {
             // For AWS Gateway, you need to JSON.stringify your body!
             return new LambdaResponse(502, 'malformed Lambda proxy response', response.headers);

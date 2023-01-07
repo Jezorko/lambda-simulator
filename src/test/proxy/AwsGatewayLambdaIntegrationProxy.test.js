@@ -1,6 +1,7 @@
 const AwsGatewayLambdaIntegrationProxy = require('../../main/proxy/AwsGatewayLambdaIntegrationProxy').AwsGatewayLambdaIntegrationProxy;
 const LambdaResponse = require('../../main/LambdaResponse').LambdaResponse;
 const assert = require('assert');
+const zlib = require("zlib")
 
 describe(AwsGatewayLambdaIntegrationProxy.name, function () {
 
@@ -156,6 +157,20 @@ describe(AwsGatewayLambdaIntegrationProxy.name, function () {
             // then:
             assert.deepStrictEqual(result.headers, {});
         });
+
+        it('should return allow a base64 encoded response', () => {
+            //given:
+            const testBody = JSON.stringify({
+                foo: "bar"
+            });
+            const testGzipped = zlib.gzipSync(JSON.stringify(testBody)).toString("base64");
+
+            //when
+            const result = simpleProxy.responseTransformer(new LambdaResponse(200, {body: testGzipped, isBase64Encoded: true}));
+            
+            //then:
+            assert.deepStrictEqual(result.body, testGzipped);
+        })
 
     });
 
