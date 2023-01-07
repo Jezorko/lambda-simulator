@@ -32,9 +32,11 @@ class LambdaSimulator {
     /**
      * @param {function} handler the AWS Lambda handler method
      * @param {LambdaSimulatorProxy?} proxy transformer for requests / responses from the handler method
+     * @param {log: boolean} options set options for the simulator 
      */
-    constructor(handler, proxy) {
+    constructor(handler, proxy, options = {log: true}) {
         this.handler = handler;
+        this.options = options;
         if (proxy) this.proxy = proxy;
     }
 
@@ -72,7 +74,7 @@ class LambdaSimulator {
                 });
             } else {
                 this.sendGetRequest(request.url, request.headers).then(result => {
-                    console.log(`result: ${result}`);
+                    if(this.options.log) console.log(`result: ${result}`);
                     response.statusCode = result.httpStatusCode;
                     Object.entries(result.headers).forEach(([name, value]) => response.setHeader(name, value));
                     if (response.getHeader("Content-Encoding")) {
@@ -138,13 +140,15 @@ class LambdaSimulator {
         const oldConsoleLog = console.log;
         console.log = (...params) => {
             const message = params[0];
-            if (typeof message === 'string') {
-                logs.push(params.slice(1).map(JSON.stringify).reduce((a,b) => a + "\t" + b, `${new Date().toISOString()} ${context.awsRequestId} ${message}`));
-                oldConsoleLog(`${new Date().toISOString()} ${context.awsRequestId} ${message}`, ...(params.slice(1)));
-            } else {
-                logs.push(params.map(JSON.stringify).reduce((a,b) => a + "\t" + b, `${new Date().toISOString()} ${context.awsRequestId}`));
-                oldConsoleLog(`${new Date().toISOString()} ${context.awsRequestId}`, message, ...(params.slice(1)));
-            }
+            if(this.options.log) {
+                if (typeof message === 'string') {
+                    logs.push(params.slice(1).map(JSON.stringify).reduce((a,b) => a + "\t" + b, `${new Date().toISOString()} ${context.awsRequestId} ${message}`));
+                    oldConsoleLog(`${new Date().toISOString()} ${context.awsRequestId} ${message}`, ...(params.slice(1)));
+                } else {
+                    logs.push(params.map(JSON.stringify).reduce((a,b) => a + "\t" + b, `${new Date().toISOString()} ${context.awsRequestId}`));
+                    oldConsoleLog(`${new Date().toISOString()} ${context.awsRequestId}`, message, ...(params.slice(1)));
+                }    
+            }   
         };
 
         // simulate sending body via wire
