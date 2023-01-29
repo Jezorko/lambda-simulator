@@ -74,7 +74,7 @@ class LambdaSimulator {
                 });
             } else {
                 this.sendGetRequest(request.url, request.headers).then(result => {
-                    if(this.options.log) console.log(`result: ${result}`);
+                    if(this.options.log && result.type != "Buffer" ) console.log(`result: ${result}`);
                     response.statusCode = result.httpStatusCode;
                     Object.entries(result.headers).forEach(([name, value]) => response.setHeader(name, value));
                     if (response.getHeader("Content-Encoding")) {
