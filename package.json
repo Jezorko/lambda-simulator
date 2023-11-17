@@ -1,6 +1,6 @@
 {
   "name": "lambda-simulator",
-  "version": "0.0.18",
+  "version": "0.0.19",
   "description": "AWS Lambda integration testing tool",
   "keywords": [
     "aws",
@@ -20,15 +20,15 @@
     "url": "git://github.com/Jezorko/lambda-simulator.git"
   },
   "engines": {
-    "node": "^20.4.0"
+    "node": "^21.1.0"
   },
   "dependencies": {
     "js-base64": "^3.7.5",
     "route-parser": "^0.0.5",
-    "uuid": "^9.0.0"
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
-    "jest": "^29.6.1"
+    "jest": "^29.7.0"
   },
   "jest": {
     "testEnvironment": "node",
